@@ -54,6 +54,18 @@ const AdminDashboard = () => {
         }
     };
 
+    const generateNewMemberToken = async () => {
+        try {
+            const response = await axios.post('/membros/new/token');
+            const token = response.data.access_token;
+            const link = `${window.location.origin}/new-member?token=${token}`;
+            window.location.href = link;
+        } catch (err) {
+            setError('Ocorreu um erro ao gerar o token para novo membro.');
+            console.error(err);
+        }
+    };
+
     const handleSort = (column) => {
         if (sortBy === column) {
             setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -91,7 +103,7 @@ const AdminDashboard = () => {
                     </div>
                     <button
                         className="btn btn-primary btn-new-member"
-                        onClick={() => window.location.href = '/new-member'}
+                        onClick={generateNewMemberToken}
                     >
                         + Novo Membro
                     </button>
