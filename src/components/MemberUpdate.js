@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import ptBR from "date-fns/locale/pt-BR";
+import './MemberUpdate.css';
 
 const MemberUpdate = () => {
     const [formData, setFormData] = useState({
@@ -164,17 +165,19 @@ const MemberUpdate = () => {
     };
 
     return (
-        <div className="container py-3" style={{ maxWidth: "1000px" }}>
-            <h2 className="mb-4">Atualização de Dados:</h2>
+        <div className="member-update-container">
+            <div className="update-header">
+                <h2>Atualização de Dados</h2>
+                <p className="text-muted">Mantenha suas informações sempre atualizadas</p>
+            </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
             {success && <div className="alert alert-success">{success}</div>}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="update-form">
                 {Object.entries(fieldGroups).map(([section, fields]) => (
-                    <div key={section} className="mb-4">
-                        <h5 className="fw-bold">{section}</h5>
-                        <hr />
+                    <div key={section} className="form-section">
+                        <h5 className="section-title">{section}</h5>
                         <div className="row">
                             {fields.map((key) => (
                                 <div className="col-12 col-md-6 col-lg-4 mb-3" key={key}>
@@ -281,18 +284,10 @@ const MemberUpdate = () => {
                     </div>
                 ))}
 
-                <button type="submit" className="btn btn-primary w-100 mt-3">
-                    Atualizar
+                <button type="submit" className="btn btn-primary btn-submit">
+                    Atualizar Dados
                 </button>
             </form>
-
-            <style>{`
-                .blocked {
-                    background-color: #e9ecef !important;
-                    color: #6c757d !important;
-                    cursor: not-allowed !important;
-                }
-            `}</style>
         </div>
     );
 };

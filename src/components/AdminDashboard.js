@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
     const [membros, setMembros] = useState([]);
@@ -7,7 +8,7 @@ const AdminDashboard = () => {
     const [error, setError] = useState('');
     const [generatedLink, setGeneratedLink] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage] = useState(5);
     const [totalMembros, setTotalMembros] = useState(0);
     const [sortBy, setSortBy] = useState('nome');
     const [sortOrder, setSortOrder] = useState('asc');
@@ -71,98 +72,135 @@ const AdminDashboard = () => {
     };
 
     if (loading) {
-        return <div>Carregando...</div>;
+        return (
+            <div className="loading-container">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Carregando...</span>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div>
-            <h1>Painel do Administrador</h1>
-            {error && <div className="alert alert-danger">{error}</div>}
-            {generatedLink && (
-                <div className="mb-3">
-                    <label htmlFor="generatedLink" className="form-label">Link Gerado</label>
-                    <input
-                        type="text"
-                        readOnly
-                        className="form-control"
-                        id="generatedLink"
-                        value={generatedLink}
-                    />
-                </div>
-            )}
-            <div className="mb-3 d-flex gap-2">
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Filtrar por nome"
-                    value={searchNome}
-                    onChange={(e) => setSearchNome(e.target.value)}
-                />
-
-                <button
-                    className="btn btn-primary"
-                    onClick={() => {
-                        setCurrentPage(1); // reseta paginação
-                        setFilterNome(searchNome);
-                    }}
-                >
-                    Buscar
-                </button>
-
-                {filterNome && (
+        <div className="dashboard-container">
+            <div className="dashboard-header">
+                <div className="header-title-section">
+                    <div>
+                        <h2>Painel do Administrador</h2>
+                        <p className="text-muted">Gerencie os membros cadastrados</p>
+                    </div>
                     <button
-                        className="btn btn-secondary"
-                        onClick={() => {
-                            setSearchNome('');
-                            setFilterNome('');
-                            setCurrentPage(1);
-                        }}
+                        className="btn btn-primary btn-new-member"
+                        onClick={() => window.location.href = '/new-member'}
                     >
-                        Limpar
+                        + Novo Membro
                     </button>
-                )}
+                </div>
             </div>
 
-            <table className="table">
-                <thead>
-                    <tr>
-                        <th onClick={() => handleSort('nome')} style={{ cursor: 'pointer' }}>
-                            Nome {sortBy === 'nome' && (sortOrder === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('email')} style={{ cursor: 'pointer' }}>
-                            Email {sortBy === 'email' && (sortOrder === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th>Celular</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {membros.map((membro) => (
-                        <tr key={membro.id}>
-                            <td>{membro.nome || 'N/A'}</td>
-                            <td>{membro.email || 'N/A'}</td>
-                            <td>{membro.celular || 'N/A'}</td>
-                            <td>
-                                <button
-                                    className="btn btn-success"
-                                    onClick={() => generateToken(membro.id)}
-                                >
-                                    Atualizar
-                                </button>
-                                &nbsp;
-                                <button
-                                    className="btn btn-primary"
-                                >
-                                    Cadastrar
-                                </button>
-                            </td>
+            {error && <div className="alert alert-danger">{error}</div>}
+
+            {generatedLink && (
+                <div className="card mb-3">
+                    <div className="card-body">
+                        <h5 className="card-title">Link de Atualização Gerado</h5>
+                        <div className="input-group">
+                            <input
+                                type="text"
+                                readOnly
+                                className="form-control"
+                                value={generatedLink}
+                            />
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(generatedLink);
+                                    alert('Link copiado!');
+                                }}
+                            >
+                                Copiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <div className="search-section mb-3">
+                <div className="input-group">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Filtrar por nome"
+                        value={searchNome}
+                        onChange={(e) => setSearchNome(e.target.value)}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                setCurrentPage(1);
+                                setFilterNome(searchNome);
+                            }
+                        }}
+                    />
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => {
+                            setCurrentPage(1);
+                            setFilterNome(searchNome);
+                        }}
+                    >
+                        Buscar
+                    </button>
+                    {filterNome && (
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => {
+                                setSearchNome('');
+                                setFilterNome('');
+                                setCurrentPage(1);
+                            }}
+                        >
+                            Limpar
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <div className="table-responsive">
+                <table className="table table-hover">
+                    <thead>
+                        <tr>
+                            <th onClick={() => handleSort('nome')} style={{ cursor: 'pointer' }}>
+                                Nome {sortBy === 'nome' && (sortOrder === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th onClick={() => handleSort('email')} style={{ cursor: 'pointer' }}>
+                                Email {sortBy === 'email' && (sortOrder === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th>Celular</th>
+                            <th>Ações</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {membros.map((membro) => (
+                            <tr key={membro.id}>
+                                <td>{membro.nome || 'N/A'}</td>
+                                <td>{membro.email || 'N/A'}</td>
+                                <td>{membro.celular || 'N/A'}</td>
+                                <td>
+                                    <button
+                                        className="btn btn-sm btn-success"
+                                        onClick={() => generateToken(membro.id)}
+                                    >
+                                        Gerar Link
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
             {totalPages > 1 && (
                 <nav>
-                    <ul className="pagination">
+                    <ul className="pagination justify-content-center">
                         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                             <button className="page-link" onClick={() => paginate(currentPage - 1)}>
                                 Anterior

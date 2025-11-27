@@ -3,10 +3,13 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import AdminDashboard from './components/AdminDashboard';
 import MemberUpdate from './components/MemberUpdate';
 import MemberCreate from "./components/MemberCreate";
+import Header from './components/Header';
+import './App.css';
 
 function App() {
     return (
         <Router>
+            <Header />
             <div className="container mt-3">
                 <Routes>
                     <Route path="/" element={<AdminDashboard/>}/>

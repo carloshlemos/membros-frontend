@@ -1,0 +1,66 @@
+@import url('https://fonts.cdnfonts.com/css/zapf-humanist-601-bt');
+
+.ipb-header {
+    background: linear-gradient(135deg, var(--ipb-primary) 0%, var(--ipb-secondary) 100%);
+    color: var(--ipb-white);
+    padding: 1.5rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.ipb-logo {
+    height: 80px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--ipb-white);
+}
+
+.header-text h1.church-name {
+    font-family: 'Zapf Humanist 601 BT', 'Zapf Humanist BT', serif;
+    font-weight: 400;
+}
+
+.header-text .subtitle {
+    margin: 0.25rem 0 0 0;
+    font-size: 1rem;
+    opacity: 0.9;
+    color: var(--ipb-white);
+}
+
+@media (max-width: 768px) {
+    .logo-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .ipb-logo {
+        height: 60px;
+    }
+    
+    .header-text h1 {
+        font-size: 1.4rem;
+    }
+    
+    .header-text .subtitle {
+        font-size: 0.9rem;
+    }
+}

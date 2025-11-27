@@ -1,15 +1,28 @@
+:root {
+  --ipb-primary: rgba(8, 79, 14, 1);
+  --ipb-secondary: rgba(10, 120, 18, 1);
+  --ipb-accent: #cc0000;
+  --ipb-light: #f8f9fa;
+  --ipb-dark: #212529;
+  --ipb-gray: #6c757d;
+  --ipb-gray-light: #e9ecef;
+  --ipb-white: #ffffff;
+  --ipb-text: #333333;
+  --ipb-border: #dee2e6;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--ipb-light);
+  color: var(--ipb-text);
 }
 
 .blocked {
-    background-color: #e9ecef !important;
-    color: #6c757d !important;
+    background-color: var(--ipb-gray-light) !important;
+    color: var(--ipb-gray) !important;
     cursor: not-allowed !important;
 }
 

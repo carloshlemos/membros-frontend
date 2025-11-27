@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--ipb-primary);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@
 }
 
 .App-link {
-  color: #61dafb;
+  color: var(--ipb-secondary);
 }
 
 @keyframes App-logo-spin {
@@ -35,4 +35,74 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.btn-primary {
+  background-color: var(--ipb-primary) !important;
+  border-color: var(--ipb-primary) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--ipb-secondary) !important;
+  border-color: var(--ipb-secondary) !important;
+}
+
+.btn-danger {
+  background-color: var(--ipb-accent) !important;
+  border-color: var(--ipb-accent) !important;
+}
+
+.table thead {
+  background-color: var(--ipb-primary);
+  color: var(--ipb-white);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(8, 79, 14, 0.05);
+}
+
+.card {
+  border: 1px solid var(--ipb-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  background-color: var(--ipb-primary);
+  color: var(--ipb-white);
+  font-weight: 600;
+}
+
+.form-control:focus {
+  border-color: var(--ipb-secondary);
+  box-shadow: 0 0 0 0.2rem rgba(10, 120, 18, 0.25);
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.page-item.active .page-link {
+  background-color: var(--ipb-primary) !important;
+  border-color: var(--ipb-primary) !important;
+  color: var(--ipb-white) !important;
+}
+
+.page-link {
+  color: var(--ipb-primary) !important;
+  background-color: var(--ipb-white);
+  border: 1px solid var(--ipb-border);
+}
+
+.page-link:hover {
+  color: var(--ipb-white) !important;
+  background-color: var(--ipb-secondary) !important;
+  border-color: var(--ipb-secondary) !important;
 }
