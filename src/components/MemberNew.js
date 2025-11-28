@@ -31,7 +31,25 @@ const MemberNew = () => {
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
     const location = useLocation();
-    const blockedFields = ['id', 'tipo_membro'];
+    const [blockedFields, setBlockedFields] = useState(['id', 'tipo_membro']);
+
+    useEffect(() => {
+        const token = getToken();
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.sub) {
+                    setFormData(prev => ({
+                        ...prev,
+                        celular: formatPhone(payload.sub)
+                    }));
+                    setBlockedFields(prev => [...prev, 'celular']);
+                }
+            } catch (e) {
+                console.error("Erro ao decodificar o token:", e);
+            }
+        }
+    }, []);
 
     // converter string dd/mm/yyyy -> objeto Date (CORRIGIDO)
     const toDateObject = (str) => {
@@ -123,7 +141,7 @@ const MemberNew = () => {
         }
 
         try {
-            await axios.post('/membros/me', formData, {
+            await axios.put('/membros/new', formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -245,16 +263,15 @@ const MemberNew = () => {
                                             ))}
                                         </select>
                                     ) : (
-                                        <input
-                                            type="text"
-                                            className={`form-control ${blockedFields.includes(key) ? 'blocked' : ''}`}
-                                            id={key}
-                                            name={key}
-                                            value={formData[key] || ''}
-                                            onChange={handleChange}
-                                            readOnly={blockedFields.includes(key)}
-                                        />
-                                    )}
+                                                                                 <input
+                                                                                    type="text"
+                                                                                    className={`form-control ${blockedFields.includes(key) ? 'blocked' : ''}`}
+                                                                                    id={key}
+                                                                                    name={key}
+                                                                                    value={formData[key] || ''}
+                                                                                    onChange={handleChange}
+                                                                                    disabled={blockedFields.includes(key)}
+                                                                                />                                    )}
                                 </div>
                             ))}
                         </div>
