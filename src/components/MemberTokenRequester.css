@@ -1,0 +1,35 @@
+.member-token-requester-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+}
+
+.token-requester-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.token-requester-header h2 {
+    font-size: 2rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.token-requester-form .form-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.alert {
+    margin-top: 20px;
+}

@@ -5,11 +5,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import ptBR from "date-fns/locale/pt-BR";
 import {useLocation} from "react-router-dom";
-import './MemberCreate.css';
+import './MemberNew.css';
 
 registerLocale("ptBR", ptBR);
 
-const MemberCreate = () => {
+const MemberNew = () => {
     const [formData, setFormData] = useState({
         nome: "",
         nascimento: "",
@@ -87,23 +87,7 @@ const MemberCreate = () => {
         return params.get('token');
     };
 
-    useEffect(() => {
-        const fetchMemberData = async () => {
-            const token = getToken();
-            if (token) {
-                try {
-                    const response = await axios.get('/membros/me', {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    setFormData(response.data);
-                } catch (err) {
-                    setError('Ocorreu um erro ao buscar os dados do membro.');
-                }
-            }
-        };
-
-        fetchMemberData();
-    }, [location.search]);
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -139,7 +123,7 @@ const MemberCreate = () => {
         }
 
         try {
-            await axios.put('/membros/me', formData, {
+            await axios.post('/membros/me', formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -293,5 +277,5 @@ const MemberCreate = () => {
     );
 };
 
-export default MemberCreate;
+export default MemberNew;
 
