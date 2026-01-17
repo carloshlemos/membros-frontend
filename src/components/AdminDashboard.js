@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { InputMask } from '@react-input/mask';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
     const [membros, setMembros] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [generatedLink, setGeneratedLink] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
     const [totalMembros, setTotalMembros] = useState(0);
@@ -15,6 +15,19 @@ const AdminDashboard = () => {
     const [sortOrder, setSortOrder] = useState('asc');
     const [searchNome, setSearchNome] = useState('');
     const [filterNome, setFilterNome] = useState('');
+
+    // State para o modal de celular
+    const [showPhoneModal, setShowPhoneModal] = useState(false);
+    const [currentMembroId, setCurrentMembroId] = useState(null);
+    const [phoneNumberInput, setPhoneNumberInput] = useState('');
+
+    const phoneInputRef = useRef(null);
+
+    useEffect(() => {
+        if (showPhoneModal && phoneInputRef.current) {
+            phoneInputRef.current.focus();
+        }
+    }, [showPhoneModal]);
 
     useEffect(() => {
         const fetchMembros = async () => {
@@ -43,16 +56,41 @@ const AdminDashboard = () => {
         fetchMembros();
     }, [currentPage, itemsPerPage, sortBy, sortOrder, filterNome]);
 
-    const generateToken = async (membroId) => {
+    const handleGenerateLinkClick = (membroId) => {
+        setCurrentMembroId(membroId);
+        setPhoneNumberInput(''); // Limpa o input ao abrir o modal
+        setShowPhoneModal(true);
+    };
+
+    const formatPhoneNumberToE164 = (maskedNumber) => {
+        // Remove todos os caracteres não numéricos
+        const digits = maskedNumber.replace(/\D/g, '');
+        // Adiciona o código do país (Brasil) se não estiver presente
+        // Assumimos que números sem 55 no início são locais e devem ser prefixados com 55
+        return digits.startsWith('55') ? digits : `55${digits}`;
+    };
+
+    const generateToken = async (membroId, celular) => {
         try {
-            const response = await axios.post(`/membros/${membroId}/token`);
-            const token = response.data.access_token;
-            const link = `${window.location.origin}/update-member?token=${token}`;
-            setGeneratedLink(link);
+            await axios.post(`/membros/${membroId}/token`, { celular });
+            toast.success('O link para atualização foi enviado para o celular informado.');
         } catch (err) {
             toast.error('Ocorreu um erro ao gerar o token.');
             console.error(err);
+        } finally {
+            setShowPhoneModal(false);
+            setCurrentMembroId(null);
+            setPhoneNumberInput('');
         }
+    };
+
+    const handlePhoneNumberSubmit = () => {
+        if (!phoneNumberInput || phoneNumberInput.replace(/\D/g, '').length < 10) { // Mínimo de 10 dígitos para DDD + 8/9 dígitos
+            toast.warn('Por favor, insira um número de celular válido (DDD + número).');
+            return;
+        }
+        const formattedCelular = formatPhoneNumberToE164(phoneNumberInput);
+        generateToken(currentMembroId, formattedCelular);
     };
 
     
@@ -101,30 +139,7 @@ const AdminDashboard = () => {
                     </a>                </div>
             </div>
 
-            {generatedLink && (
-                <div className="card mb-3">
-                    <div className="card-body">
-                        <h5 className="card-title">Link de Atualização Gerado</h5>
-                        <div className="input-group">
-                            <input
-                                type="text"
-                                readOnly
-                                className="form-control"
-                                value={generatedLink}
-                            />
-                            <button
-                                className="btn btn-primary"
-                                onClick={() => {
-                                    navigator.clipboard.writeText(generatedLink);
-                                    toast.success('Link copiado!');
-                                }}
-                            >
-                                Copiar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            
 
             <div className="search-section mb-3">
                 <div className="input-group">
@@ -202,7 +217,7 @@ const AdminDashboard = () => {
                                     </button>
                                     <button
                                         className="btn btn-sm btn-success"
-                                        onClick={() => generateToken(membro.id)}
+                                        onClick={() => handleGenerateLinkClick(membro.id)}
                                     >
                                         Gerar Link
                                     </button>
@@ -251,6 +266,43 @@ const AdminDashboard = () => {
                         </li>
                     </ul>
                 </nav>
+            )}
+
+            {/* Modal de Input de Celular */}
+            {showPhoneModal && (
+                <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Informar Celular</h5>
+                                <button type="button" className="btn-close" aria-label="Close" onClick={() => setShowPhoneModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Por favor, digite o número do celular para enviar o link de atualização:</p>
+                                <div className="input-group mb-3">
+                                    <span className="input-group-text"><i className="bi bi-phone"></i></span>
+                                    <InputMask
+                                        ref={phoneInputRef}
+                                        mask="(__) _____-____"
+                                        replacement={{ _: /\d/ }}
+                                        value={phoneNumberInput}
+                                        onChange={(e) => setPhoneNumberInput(e.target.value)}
+                                        className="form-control"
+                                        placeholder="(DD) XXXXX-XXXX"
+                                    />
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowPhoneModal(false)}>
+                                    Cancelar
+                                </button>
+                                <button type="button" className="btn btn-primary" onClick={handlePhoneNumberSubmit}>
+                                    Enviar Link
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
