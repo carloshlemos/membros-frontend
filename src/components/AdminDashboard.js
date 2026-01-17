@@ -85,7 +85,7 @@ const AdminDashboard = () => {
     };
 
     const handlePhoneNumberSubmit = () => {
-        if (!phoneNumberInput || phoneNumberInput.replace(/\D/g, '').length < 10) { // Mínimo de 10 dígitos para DDD + 8/9 dígitos
+        if (!phoneNumberInput || phoneNumberInput.replace(/\D/g, '').length < 10) {
             toast.warn('Por favor, insira um número de celular válido (DDD + número).');
             return;
         }
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
                                         value={phoneNumberInput}
                                         onChange={(e) => setPhoneNumberInput(e.target.value)}
                                         className="form-control"
-                                        placeholder="(DD) XXXXX-XXXX"
+                                        placeholder="(99) 99999-9999"
                                     />
                                 </div>
                             </div>

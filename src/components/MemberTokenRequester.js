@@ -26,15 +26,16 @@ const MemberTokenRequester = () => {
         e.preventDefault();
         setLoading(true);
 
-        if (!celular) {
-            toast.error('Por favor, informe o número do celular.');
+        if (!celular || celular.replace(/\D/g, '').length < 10) {
+            toast.warn('Por favor, insira um número de celular válido (DDD + número).');
             setLoading(false);
             return;
         }
+        const formattedCelular = formatPhoneNumberToE164(celular);
 
         try {
             const response = await axios.post('/membros/new/token', {
-                celular: celular.replace(/\D/g, "")
+                celular: formattedCelular
             });
 
             const token = response.data.access_token;
@@ -50,6 +51,14 @@ const MemberTokenRequester = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const formatPhoneNumberToE164 = (maskedNumber) => {
+        // Remove todos os caracteres não numéricos
+        const digits = maskedNumber.replace(/\D/g, '');
+        // Adiciona o código do país (Brasil) se não estiver presente
+        // Assumimos que números sem 55 no início são locais e devem ser prefixados com 55
+        return digits.startsWith('55') ? digits : `55${digits}`;
     };
 
     return (

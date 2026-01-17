@@ -2,10 +2,10 @@ import React, {useEffect, useState, useCallback} from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { registerLocale } from "react-datepicker";
+import {registerLocale} from "react-datepicker";
 import ptBR from "date-fns/locale/pt-BR";
 import {useLocation} from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
+import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './MemberNew.css';
 
@@ -96,7 +96,7 @@ const MemberNew = () => {
         // Remove qualquer coisa que não seja número
         value = value.replace(/\D/g, "");
 
-        // Limita em 11 dígitos (padrão Brasil)
+        // Limita em 11 dígitos (padrão Brasil) 5562996415795
         if (value.length > 11) value = value.slice(0, 11);
 
         // Aplicar máscara
@@ -123,7 +123,7 @@ const MemberNew = () => {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
 
         if (name === "telefone" || name === "celular") {
             setFormData(prev => ({
@@ -141,7 +141,7 @@ const MemberNew = () => {
             return;
         }
 
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({...prev, [name]: value}));
     };
 
     const handleSubmit = async (e) => {
@@ -157,7 +157,7 @@ const MemberNew = () => {
 
         try {
             await axios.put('/membros/new', formData, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: {Authorization: `Bearer ${token}`}
             });
 
             toast.success('Dados cadastrados com sucesso!');
@@ -181,15 +181,15 @@ const MemberNew = () => {
     };
 
     return (
-        <div className="container py-3" style={{ maxWidth: "1000px" }}>
-            <ToastContainer />
+        <div className="container py-3" style={{maxWidth: "1000px"}}>
+            <ToastContainer/>
             <h2 className="mb-4">Cadastro:</h2>
 
             <form onSubmit={handleSubmit}>
                 {Object.entries(fieldGroups).map(([section, fields]) => (
                     <div key={section} className="mb-4">
                         <h5 className="fw-bold">{section}</h5>
-                        <hr />
+                        <hr/>
                         <div className="row">
                             {fields.map((key) => {
                                 const isDatePicker = ['nascimento', 'data_casamento', 'batismo_data', 'profissao_fe_data'].includes(key);
@@ -205,11 +205,11 @@ const MemberNew = () => {
                                             <DatePicker
                                                 locale="ptBR"
                                                 selected={toDateObject(formData[key])}
-                                                                                            onChange={(date) =>
-                                                                                                setFormData(prev => ({
-                                                                                                    ...prev,
-                                                                                                    [key]: toStringISO(date)
-                                                                                                }))                                                }
+                                                onChange={(date) =>
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        [key]: toStringISO(date)
+                                                    }))}
                                                 dateFormat="dd/MM/yyyy"
                                                 placeholderText="Selecione a data"
                                                 className="form-control"
@@ -227,7 +227,7 @@ const MemberNew = () => {
                                                 disabled={blockedFields.includes(key)}
                                             >
                                                 <option value="">Selecione...</option>
-                                                 {
+                                                {
                                                     (key === "escolaridade" ?
                                                         ["Ensino Fundamental Incompleto", "Ensino Fundamental Completo",
                                                             "Ensino Médio Incompleto", "Ensino Médio Completo",
