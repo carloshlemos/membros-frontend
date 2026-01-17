@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
     const [membros, setMembros] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [generatedLink, setGeneratedLink] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
@@ -32,7 +33,7 @@ const AdminDashboard = () => {
                 setMembros(response.data.membros);
                 setTotalMembros(response.data.total);
             } catch (err) {
-                setError('Ocorreu um erro ao buscar os membros.');
+                toast.error('Ocorreu um erro ao buscar os membros.');
                 console.error(err);
             } finally {
                 setLoading(false);
@@ -49,7 +50,7 @@ const AdminDashboard = () => {
             const link = `${window.location.origin}/update-member?token=${token}`;
             setGeneratedLink(link);
         } catch (err) {
-            setError('Ocorreu um erro ao gerar o token.');
+            toast.error('Ocorreu um erro ao gerar o token.');
             console.error(err);
         }
     };
@@ -85,6 +86,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="dashboard-container">
+            <ToastContainer />
             <div className="dashboard-header">
                 <div className="header-title-section">
                     <div>
@@ -98,8 +100,6 @@ const AdminDashboard = () => {
                         + Novo Membro
                     </a>                </div>
             </div>
-
-            {error && <div className="alert alert-danger">{error}</div>}
 
             {generatedLink && (
                 <div className="card mb-3">
@@ -116,7 +116,7 @@ const AdminDashboard = () => {
                                 className="btn btn-primary"
                                 onClick={() => {
                                     navigator.clipboard.writeText(generatedLink);
-                                    alert('Link copiado!');
+                                    toast.success('Link copiado!');
                                 }}
                             >
                                 Copiar
@@ -176,6 +176,12 @@ const AdminDashboard = () => {
                                 Email {sortBy === 'email' && (sortOrder === 'asc' ? '▲' : '▼')}
                             </th>
                             <th>Celular</th>
+                            <th onClick={() => handleSort('tipo_membro')} style={{ cursor: 'pointer' }}>
+                                Tipo de Membro {sortBy === 'tipo_membro' && (sortOrder === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th onClick={() => handleSort('oficio')} style={{ cursor: 'pointer' }}>
+                                Ofício {sortBy === 'oficio' && (sortOrder === 'asc' ? '▲' : '▼')}
+                            </th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -185,7 +191,15 @@ const AdminDashboard = () => {
                                 <td>{membro.nome || 'N/A'}</td>
                                 <td>{membro.email || 'N/A'}</td>
                                 <td>{membro.celular || 'N/A'}</td>
+                                <td>{membro.tipo_membro || 'N/A'}</td>
+                                <td>{membro.oficio || 'N/A'}</td>
                                 <td>
+                                    <button
+                                        className="btn btn-sm btn-info me-2"
+                                        onClick={() => alert(`Detalhes do Membro ${membro.nome}`)}
+                                    >
+                                        Ver Detalhes
+                                    </button>
                                     <button
                                         className="btn btn-sm btn-success"
                                         onClick={() => generateToken(membro.id)}

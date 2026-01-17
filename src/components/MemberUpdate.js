@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import ptBR from "date-fns/locale/pt-BR";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './MemberUpdate.css';
 
 const MemberUpdate = () => {
@@ -14,8 +16,13 @@ const MemberUpdate = () => {
         nascimento: '',
         naturalidade: '',
         estado_civil: '',
+        nome_conjuge: '',
+        data_casamento: '',
+        rg: '',
         escolaridade: '',
         profissao: '',
+        nome_pai: '',
+        nome_mae: '',
         telefone: '',
         celular: '',
         email: '',
@@ -24,32 +31,41 @@ const MemberUpdate = () => {
         bairro: '',
         cep: '',
         cidade: '',
+        pais: '',
         tipo_membro: '',
-        oficio: ''
+        oficio: '',
+        batismo_data: '',
+        batismo_pastor: '',
+        batismo_igreja: '',
+        profissao_fe_data: '',
+        profissao_fe_pastor: '',
+        profissao_fe_igreja: '',
     });
 
     registerLocale("ptBR", ptBR);
 
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
     const location = useLocation();
 
-    const blockedFields = ['id', 'tipo_membro'];
+    const blockedFields = ['id', 'tipo_membro', 'oficio'];
 
-    // converter string dd/mm/yyyy -> objeto Date (CORRIGIDO)
-    const toDateObject = (str) => {
-        if (!str || !str.includes('/')) return null;
-        const [day, month, year] = str.split('/');
-        return new Date(Number(year), Number(month) - 1, Number(day));
+    // converter string ISO 8601 ou Date -> objeto Date
+    const toDateObject = (dateInput) => {
+        if (!dateInput) return null;
+        if (dateInput instanceof Date) return dateInput;
+        // Assume ISO 8601 string if not a Date object
+        try {
+            return new Date(dateInput);
+        } catch (e) {
+            console.error("Erro ao converter data para objeto Date:", e);
+            return null;
+        }
     };
 
-    // converter objeto Date -> dd/mm/yyyy
-    const toStringBR = (date) => {
+    // converter objeto Date -> string ISO 8601
+    const toStringISO = (date) => {
         if (!(date instanceof Date) || isNaN(date)) return '';
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
+        return date.toISOString();
     };
 
     const formatPhone = (value) => {
@@ -85,10 +101,10 @@ const MemberUpdate = () => {
     };
 
 
-    const getToken = () => {
+    const getToken = useCallback(() => {
         const params = new URLSearchParams(location.search);
         return params.get('token');
-    };
+    }, [location.search]);
 
     useEffect(() => {
         const fetchMemberData = async () => {
@@ -100,13 +116,13 @@ const MemberUpdate = () => {
                     });
                     setFormData(response.data);
                 } catch (err) {
-                    setError('Ocorreu um erro ao buscar os dados do membro.');
+                    toast.error('Ocorreu um erro ao buscar os dados do membro.');
                 }
             }
         };
 
         fetchMemberData();
-    }, [location.search]);
+    }, [getToken]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -134,12 +150,12 @@ const MemberUpdate = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
+        setLoading(true);
         const token = getToken();
 
         if (!token) {
-            setError('Token não encontrado.');
+            toast.error('Token não encontrado.');
+            setLoading(false);
             return;
         }
 
@@ -148,144 +164,121 @@ const MemberUpdate = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            setSuccess('Dados atualizados com sucesso!');
-
-            setTimeout(() => {
-                setSuccess('');
-            }, 3000);
+            toast.success('Dados atualizados com sucesso!');
         } catch (err) {
-            setError('Ocorreu um erro ao atualizar os dados.');
+            toast.error('Ocorreu um erro ao atualizar os dados.');
+        } finally {
+            setLoading(false);
         }
     };
-
+    
     const fieldGroups = {
-        'Dados Pessoais': ['nome', 'sexo', 'nascimento', 'naturalidade', 'estado_civil', 'escolaridade', 'profissao'],
+        'Dados Pessoais': [
+            'nome', 'sexo', 'nascimento', 'naturalidade', 'estado_civil', 'nome_conjuge', 'data_casamento',
+            'rg', 'escolaridade', 'profissao', 'nome_pai', 'nome_mae'
+        ],
         'Contato': ['telefone', 'celular', 'email'],
-        'Endereço': ['endereco', 'complemento', 'bairro', 'cep', 'cidade']
+        'Endereço': ['endereco', 'complemento', 'bairro', 'cidade', 'pais', 'cep'],
+        'Dados Eclesiásticos': ['tipo_membro', 'oficio'],
+        'Batismo': ['batismo_data', 'batismo_pastor', 'batismo_igreja'],
+        'Profissão de Fé': ['profissao_fe_data', 'profissao_fe_pastor', 'profissao_fe_igreja']
     };
 
     return (
         <div className="member-update-container">
+            <ToastContainer />
             <div className="update-header">
                 <h2>Atualização de Dados</h2>
                 <p className="text-muted">Mantenha suas informações sempre atualizadas</p>
             </div>
-
-            {error && <div className="alert alert-danger">{error}</div>}
-            {success && <div className="alert alert-success">{success}</div>}
 
             <form onSubmit={handleSubmit} className="update-form">
                 {Object.entries(fieldGroups).map(([section, fields]) => (
                     <div key={section} className="form-section">
                         <h5 className="section-title">{section}</h5>
                         <div className="row">
-                            {fields.map((key) => (
-                                <div className="col-12 col-md-6 col-lg-4 mb-3" key={key}>
-                                <label htmlFor={key} className="form-label">
-                                        {`${key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}:`}
-                                    </label>
+                            {fields.map((key) => {
+                                const isDatePicker = ['nascimento', 'data_casamento', 'batismo_data', 'profissao_fe_data'].includes(key);
+                                const isSelect = ['escolaridade', 'estado_civil', 'sexo'].includes(key);
+                                const isBlocked = blockedFields.includes(key);
 
-                                    {key === "nascimento" ? (
-                                        <DatePicker
-                                            locale="ptBR"
-                                            selected={toDateObject(formData[key])}
-                                            onChange={(date) =>
-                                                setFormData(prev => ({
-                                                    ...prev,
-                                                    [key]: toStringBR(date)
-                                                }))
-                                            }
-                                            dateFormat="dd/MM/yyyy"
-                                            placeholderText="Selecione a data"
-                                            className="form-control"
-                                            showYearDropdown
-                                            showMonthDropdown
-                                            dropdownMode="select"
-                                        />
-                                    ) : key === "escolaridade" ? (
-                                        <select
-                                            className={`form-select ${blockedFields.includes(key) ? 'blocked' : ''}`}
-                                            name={key}
-                                            id={key}
-                                            value={formData[key] || ""}
-                                            onChange={handleChange}
-                                            disabled={blockedFields.includes(key)}
-                                        >
-                                            <option value="">Selecione...</option>
-                                            {[
-                                                "Ensino Fundamental Incompleto",
-                                                "Ensino Fundamental Completo",
-                                                "Ensino Médio Incompleto",
-                                                "Ensino Médio Completo",
-                                                "Superior Incompleto",
-                                                "Superior Completo",
-                                                "Pós-Graduação",
-                                                "Mestrado",
-                                                "Doutorado",
-                                                "Outro"
-                                            ].map(option => (
-                                                <option key={option} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : key === "estado_civil" ? (
-                                        <select
-                                            className={`form-select ${blockedFields.includes(key) ? 'blocked' : ''}`}
-                                            name={key}
-                                            id={key}
-                                            value={formData[key] || ""}
-                                            onChange={handleChange}
-                                            disabled={blockedFields.includes(key)}
-                                        >
-                                            <option value="">Selecione...</option>
-                                            {[
-                                                "Solteiro(a)",
-                                                "Casado(a)",
-                                                "Divorciado(a)",
-                                                "Separado(a)",
-                                                "Viúvo(a)",
-                                                "União Estável"
-                                            ].map(option => (
-                                                <option key={option} value={option}>{option}</option>
-                                            ))}
-                                        </select>
-                                    ) : key === "sexo" ? (
-                                        <select
-                                            className={`form-select ${blockedFields.includes(key) ? 'blocked' : ''}`}
-                                            name={key}
-                                            id={key}
-                                            value={formData[key] || ""}
-                                            onChange={handleChange}
-                                            disabled={blockedFields.includes(key)}
-                                        >
-                                            <option value="">Selecione...</option>
-                                            {[
-                                                "Feminino",
-                                                "Masculino"
-                                            ].map(option => (
-                                                <option key={option} value={option}>{option}</option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            type="text"
-                                            className={`form-control ${blockedFields.includes(key) ? 'blocked' : ''}`}
-                                            id={key}
-                                            name={key}
-                                            value={formData[key] || ''}
-                                            onChange={handleChange}
-                                            readOnly={blockedFields.includes(key)}
-                                        />
-                                    )}
-                                </div>
-                            ))}
+                                return (
+                                    <div className="col-12 col-md-6 col-lg-4 mb-3" key={key}>
+                                        <label htmlFor={key} className="form-label">
+                                            {`${key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}:`}
+                                        </label>
+
+                                        {isBlocked ? (
+                                            <input
+                                                type="text"
+                                                className="form-control blocked"
+                                                id={key}
+                                                name={key}
+                                                value={formData[key] || ''}
+                                                readOnly
+                                            />
+                                        ) : isDatePicker ? (
+                                            <DatePicker
+                                                locale="ptBR"
+                                                selected={toDateObject(formData[key])}
+                                                onChange={(date) =>
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        [key]: toStringISO(date)
+                                                    }))
+                                                }
+                                                dateFormat="dd/MM/yyyy"
+                                                placeholderText="Selecione a data"
+                                                className="form-control"
+                                                showYearDropdown
+                                                showMonthDropdown
+                                                dropdownMode="select"
+                                            />
+                                        ) : isSelect ? (
+                                            <select
+                                                className="form-select"
+                                                name={key}
+                                                id={key}
+                                                value={formData[key] || ""}
+                                                onChange={handleChange}
+                                            >
+                                                <option value="">Selecione...</option>
+                                                                                                 {
+                                                                                                    (key === "escolaridade" ?
+                                                                                                        ["Ensino Fundamental Incompleto", "Ensino Fundamental Completo",
+                                                                                                            "Ensino Médio Incompleto", "Ensino Médio Completo",
+                                                                                                            "Superior Incompleto", "Superior Completo",
+                                                                                                            "Pós-Graduação", "Mestrado", "Doutorado", "Outro"] :
+                                                                                                                                                                                                                 key === "estado_civil" ?
+                                                                                                                                                                                                                    ["Solteiro", "Casado", "Divorciado", "Separado", "Viúvo", "União Estável"] :                                                                                                            key === "sexo" ?
+                                                                                                                ["Feminino", "Masculino"] :
+                                                                                                                [])
+                                                                                                        .map(option => (
+                                                                                                            <option key={option} value={option}>
+                                                                                                                {option}
+                                                                                                            </option>
+                                                                                                        ))
+                                                                                                }
+                                            </select>
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id={key}
+                                                name={key}
+                                                value={formData[key] || ''}
+                                                onChange={handleChange}
+                                            />
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 ))}
 
-                <button type="submit" className="btn btn-primary btn-submit">
-                    Atualizar Dados
+                <button type="submit" className="btn btn-primary btn-submit" disabled={loading}>
+                    {loading ? 'Atualizando...' : 'Atualizar Dados'}
                 </button>
             </form>
         </div>

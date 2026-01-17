@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './MemberTokenRequester.css';
 
 const MemberTokenRequester = () => {
     const [celular, setCelular] = useState('');
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const formatPhone = (value) => {
         if (!value) return "";
@@ -23,44 +24,41 @@ const MemberTokenRequester = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
+        setLoading(true);
 
         if (!celular) {
-            setError('Por favor, informe o número do celular.');
+            toast.error('Por favor, informe o número do celular.');
+            setLoading(false);
             return;
         }
 
         try {
             const response = await axios.post('/membros/new/token', {
-                telefone: celular.replace(/\D/g, "")
+                celular: celular.replace(/\D/g, "")
             });
 
             const token = response.data.access_token;
             const newMemberLink = `/new-member?token=${token}`;
-            setSuccess(
+            toast.success(
                 <span>
-                    Token gerado com sucesso! Por favor, acesse o link a seguir para continuar o cadastro: 
-                    <a href={newMemberLink}>
-                        {`${newMemberLink.substring(0, 40)}...${newMemberLink.substring(newMemberLink.length - 20)}`}
-                    </a>
-                </span>
+                    Token gerado com sucesso! Clique <a href={newMemberLink}>aqui</a> para continuar.
+                </span>, { autoClose: false }
             );
 
         } catch (err) {
-            setError('Ocorreu um erro ao gerar o token. Verifique o número e tente novamente.');
+            toast.error('Ocorreu um erro ao gerar o token. Verifique o número e tente novamente.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="member-token-requester-container">
+            <ToastContainer />
             <div className="token-requester-header">
                 <h2>Gerar Token para Novo Membro</h2>
                 <p className="text-muted">Informe seu celular para iniciar o cadastro.</p>
             </div>
-
-            {error && <div className="alert alert-danger">{error}</div>}
-            {success && <div className="alert alert-success">{success}</div>}
 
             <form onSubmit={handleSubmit} className="token-requester-form">
                 <div className="mb-3">
@@ -75,8 +73,8 @@ const MemberTokenRequester = () => {
                         placeholder="(00) 00000-0000"
                     />
                 </div>
-                <button type="submit" className="btn btn-primary btn-submit">
-                    Gerar Token
+                <button type="submit" className="btn btn-primary btn-submit" disabled={loading}>
+                    {loading ? 'Gerando...' : 'Gerar Token'}
                 </button>
             </form>
         </div>
