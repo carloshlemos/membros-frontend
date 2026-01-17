@@ -210,12 +210,6 @@ const AdminDashboard = () => {
                                 <td>{membro.oficio || 'N/A'}</td>
                                 <td>
                                     <button
-                                        className="btn btn-sm btn-info me-2"
-                                        onClick={() => alert(`Detalhes do Membro ${membro.nome}`)}
-                                    >
-                                        Ver Detalhes
-                                    </button>
-                                    <button
                                         className="btn btn-sm btn-success"
                                         onClick={() => handleGenerateLinkClick(membro.id)}
                                     >

@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 import './MemberTokenRequester.css';
 
 const MemberTokenRequester = () => {
     const [celular, setCelular] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const formatPhone = (value) => {
         if (!value) return "";
@@ -42,9 +44,10 @@ const MemberTokenRequester = () => {
             const newMemberLink = `/new-member?token=${token}`;
             toast.success(
                 <span>
-                    Token gerado com sucesso! Clique <a href={newMemberLink}>aqui</a> para continuar.
+                    Token gerado com sucesso!
                 </span>, { autoClose: false }
             );
+            navigate('/');
 
         } catch (err) {
             toast.error('Ocorreu um erro ao gerar o token. Verifique o número e tente novamente.');
