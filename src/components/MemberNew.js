@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useCallback} from "react";
+import { InputMask } from '@react-input/mask';
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -92,21 +93,22 @@ const MemberNew = () => {
 
     const formatPhone = (value) => {
         if (!value) return "";
+        value = value.replace(/\D/g, ""); // Remove non-digits
 
-        // Remove qualquer coisa que não seja número
-        value = value.replace(/\D/g, "");
-
-        // Limita em 11 dígitos (padrão Brasil) 5562996415795
-        if (value.length > 11) value = value.slice(0, 11);
-
-        // Aplicar máscara
-        if (value.length <= 10) {
-            // Telefone fixo (8 dígitos)
-            return value.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+        // If the number starts with '55', remove it (assuming it's the country code)
+        if (value.startsWith("55") && value.length > 2) {
+            value = value.substring(2); // Remove '55'
         }
 
-        // Celular (9 dígitos)
-        return value.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+        // Apply local Brazilian mask: (XX) XXXXX-XXXX or (XX) XXXX-XXXX
+        if (value.length > 10) { // Mobile with 9th digit: (XX) 9XXXX-XXXX
+            return value.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        } else if (value.length === 10) { // Mobile without 9th digit or landline: (XX) XXXX-XXXX
+            return value.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+        } else if (value.length > 2) { // Just DDD, or partial number
+            return value.replace(/(\d{2})/, "($1) ");
+        }
+        return value;
     };
 
     const formatCEP = (value) => {
@@ -125,7 +127,7 @@ const MemberNew = () => {
     const handleChange = (e) => {
         const {name, value} = e.target;
 
-        if (name === "telefone" || name === "celular") {
+        if (name === "telefone") {
             setFormData(prev => ({
                 ...prev,
                 [name]: formatPhone(value)
@@ -249,7 +251,17 @@ const MemberNew = () => {
                                                         ))
                                                 }
                                             </select>
-                                        ) : (
+                                         ) : key === 'celular' ? (
+                                            <InputMask
+                                                mask="(__) _____-____"
+                                                replacement={{ _: /\d/ }}
+                                                value={formData[key] || ''}
+                                                onChange={handleChange}
+                                                disabled={blockedFields.includes(key)}
+                                                className={`form-control ${blockedFields.includes(key) ? 'blocked' : ''}`}
+                                                id={key}
+                                                name={key}
+                                            />                                        ) : (
                                             <input
                                                 type="text"
                                                 className={`form-control ${blockedFields.includes(key) ? 'blocked' : ''}`}
