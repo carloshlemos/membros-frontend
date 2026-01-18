@@ -1,0 +1,33 @@
+.login-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.login-container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 450px;
+    margin: auto; /* Centraliza o container */
+}
+
+.login-container h2 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.login-container p {
+    margin-bottom: 2rem;
+    color: #666;
+}
+
+.login-container .btn-primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+}
