@@ -177,7 +177,6 @@ const MemberNew = () => {
         ],
         'Contato': ['telefone', 'celular', 'email'],
         'Endereço': ['endereco', 'complemento', 'bairro', 'cidade', 'pais', 'cep'],
-        'Dados Eclesiásticos': ['tipo_membro', 'oficio'],
         'Batismo': ['batismo_data', 'batismo_pastor', 'batismo_igreja'],
         'Profissão de Fé': ['profissao_fe_data', 'profissao_fe_pastor', 'profissao_fe_igreja']
     };
