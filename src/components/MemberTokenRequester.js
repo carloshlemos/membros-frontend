@@ -36,12 +36,10 @@ const MemberTokenRequester = () => {
         const formattedCelular = formatPhoneNumberToE164(celular);
 
         try {
-            const response = await axios.post('/membros/new/token', {
+            await axios.post('/membros/new/token', {
                 celular: formattedCelular
             });
 
-            const token = response.data.access_token;
-            const newMemberLink = `/new-member?token=${token}`;
             toast.success(
                 <span>
                     Token gerado com sucesso!
