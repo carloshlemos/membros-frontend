@@ -19,6 +19,7 @@ const MemberUpdate = () => {
         nome_conjuge: '',
         data_casamento: '',
         rg: '',
+        orgao_emissor: '',
         escolaridade: '',
         profissao: '',
         nome_pai: '',
@@ -34,6 +35,14 @@ const MemberUpdate = () => {
         pais: '',
         tipo_membro: '',
         oficio: '',
+        situacao: '',
+        numero_ordem: '',
+        data_admissao: '',
+        meio_admissao: '',
+        data_demissao: '',
+        meio_demissao: '',
+        disciplinado: false,
+        transferencia_pendente: false,
         batismo_data: '',
         batismo_pastor: '',
         batismo_igreja: '',
@@ -47,7 +56,23 @@ const MemberUpdate = () => {
     const [loading, setLoading] = useState(false);
     const location = useLocation();
 
-    const blockedFields = ['id', 'tipo_membro', 'oficio'];
+    const blockedFields = [
+        'id', 'tipo_membro', 'oficio', 'situacao', 'numero_ordem',
+        'data_admissao', 'meio_admissao', 'data_demissao', 'meio_demissao',
+        'disciplinado', 'transferencia_pendente'
+    ];
+
+    const getBlockedDisplayValue = (key) => {
+        const value = formData[key];
+        if (['disciplinado', 'transferencia_pendente'].includes(key)) {
+            return value ? 'Sim' : 'Não';
+        }
+        if (['data_admissao', 'data_demissao'].includes(key)) {
+            const date = toDateObject(value);
+            return date ? date.toLocaleDateString('pt-BR') : '';
+        }
+        return value || '';
+    };
 
     // converter string ISO 8601 ou Date -> objeto Date
     const toDateObject = (dateInput) => {
@@ -175,11 +200,15 @@ const MemberUpdate = () => {
     const fieldGroups = {
         'Dados Pessoais': [
             'nome', 'sexo', 'nascimento', 'naturalidade', 'estado_civil', 'nome_conjuge', 'data_casamento',
-            'rg', 'escolaridade', 'profissao', 'nome_pai', 'nome_mae'
+            'rg', 'orgao_emissor', 'escolaridade', 'profissao', 'nome_pai', 'nome_mae'
         ],
         'Contato': ['telefone', 'celular', 'email'],
         'Endereço': ['endereco', 'complemento', 'bairro', 'cidade', 'pais', 'cep'],
-        'Dados Eclesiásticos': ['tipo_membro', 'oficio'],
+        'Dados Eclesiásticos': [
+            'tipo_membro', 'oficio', 'situacao', 'numero_ordem',
+            'data_admissao', 'meio_admissao', 'data_demissao', 'meio_demissao',
+            'disciplinado', 'transferencia_pendente'
+        ],
         'Batismo': ['batismo_data', 'batismo_pastor', 'batismo_igreja'],
         'Profissão de Fé': ['profissao_fe_data', 'profissao_fe_pastor', 'profissao_fe_igreja']
     };
@@ -214,7 +243,7 @@ const MemberUpdate = () => {
                                                 className="form-control blocked"
                                                 id={key}
                                                 name={key}
-                                                value={formData[key] || ''}
+                                                value={getBlockedDisplayValue(key)}
                                                 readOnly
                                             />
                                         ) : isDatePicker ? (

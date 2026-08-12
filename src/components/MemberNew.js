@@ -22,6 +22,7 @@ const MemberNew = () => {
         nome_conjuge: "",
         data_casamento: "",
         rg: "",
+        orgao_emissor: "",
         escolaridade: "",
         profissao: "",
         nome_pai: "",
@@ -173,7 +174,7 @@ const MemberNew = () => {
     const fieldGroups = {
         'Dados Pessoais': [
             'nome', 'sexo', 'nascimento', 'naturalidade', 'estado_civil', 'nome_conjuge', 'data_casamento',
-            'rg', 'escolaridade', 'profissao', 'nome_pai', 'nome_mae'
+            'rg', 'orgao_emissor', 'escolaridade', 'profissao', 'nome_pai', 'nome_mae'
         ],
         'Contato': ['telefone', 'celular', 'email'],
         'Endereço': ['endereco', 'complemento', 'bairro', 'cidade', 'pais', 'cep'],
