@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { useAuthContext } from "@asgardeo/auth-react";
+import { useAuthContext } from "./auth/AuthProvider";
 
 import AdminDashboard from './components/AdminDashboard';
 import MemberUpdate from './components/MemberUpdate';

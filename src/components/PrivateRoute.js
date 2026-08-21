@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuthContext } from "@asgardeo/auth-react";
+import { useAuthContext } from "../auth/AuthProvider";
 
 const PrivateRoute = ({ children }) => {
     const { state } = useAuthContext();

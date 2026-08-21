@@ -1,4 +1,4 @@
-import { useAuthContext } from "@asgardeo/auth-react";
+import { useAuthContext } from "../auth/AuthProvider";
 import React from "react";
 import Header from "./Header";
 import './LoginPage.css';

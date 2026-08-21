@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css';
 import ipbLogo from '../assets/ipb-logo.png';
-import { useAuthContext } from "@asgardeo/auth-react";
+import { useAuthContext } from "../auth/AuthProvider";
 
 const Header = () => {
     const { state, signOut } = useAuthContext();
